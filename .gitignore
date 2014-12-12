@@ -1,3 +1,6 @@
+vm
+assembler/assembler
+
 # Object files
 *.o
 *.ko
