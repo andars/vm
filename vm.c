@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     while(fread(&bytecode, 1, 1, input)) {
         uint8_t a;
         uint8_t b;
-        
+
         printf("read bytecode: ");
         switch (bytecode) {
         case BC_PUSH: 
@@ -58,12 +58,12 @@ int main(int argc, char** argv) {
             break;
         default:
             printf("unrecognized\n");
-            break;                
-        } 
+            break;
+        }
         if (stack_top >= STACK_SIZE) {
             printf("ERROR: stack overflow\n");
             return 1;
         }
     }
-    return 0; 
+    return 0;
 }
