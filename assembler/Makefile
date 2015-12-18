@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Werror -std=c99
+CFLAGS = -Wall -std=c99
 
 
 SOURCES = $(wildcard *.c)
@@ -7,14 +7,10 @@ OBJECTS = $(SOURCES:.c=.o)
 
 .PHONY: all
 
-all: vm assembler
+all: assembler
 
-assembler:
-	$(MAKE) -C assembler
-
-
-vm: $(OBJECTS)
-	$(CC) $(CFLAGS) -o vm $^
+assembler: $(OBJECTS)
+	$(CC) $(CFLAGS) -o assembler $^
 
 %.o: %.c 
 	$(CC) -c $(CFLAGS) -o $@ $<
