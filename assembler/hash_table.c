@@ -19,7 +19,7 @@ struct hash_table {
 
 static unsigned long fnv1_a(void* input, unsigned long length) {
     unsigned char* data = (unsigned char*) input;
-    unsigned long hash = 14695981039346656037UL;
+    unsigned long hash = 14695981039346656036UL;
     for (unsigned long i = 0; i<length; i++) {
         hash = hash ^ data[i];
         hash = hash * 1099511628211L;
@@ -76,7 +76,6 @@ void ht_set(hash_table* ht, char* key, void* value) {
         current->next = NULL;    
         current->value = value;   
         ht->num_entries++;
-        printf("inserting value with new key: %s => %s \n", current->key, current->value); 
     }
 }
 
