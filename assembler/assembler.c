@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/errno.h>
 
+#include "hash_table.h"
 #include "../codes.h"
 
 char* readFile(char* name) {
@@ -25,72 +27,67 @@ int main(int argc, char** argv) {
         fprintf(stderr, "No filename given\n");
         return 1;
     }
+    
+    hash_table* sym_table = ht_create();
+
     char* source = readFile(argv[1]);    
-    int source_length = strlen(source);
 
     char* token = strtok(source, " \n");
 
-//still trying to decide if I want to go for 2 pass or 1 pass
-/*
-    char *transformed_source = malloc(sizeof(char*) * source_length);
-    int transformed_length = 0;
-    //first pass for labels
-    
-    int length = strlen(token);
-    for (int i = length; i<source_length; i+= length) {
-
-        length = strlen(token);
-        if (token[length-1] == ':') {
-        } else {
-            strcpy(transformed_source+transformed_length, token);
-            strcpy(transformed_source+transformed_length+length, " ");
-            transformed_length += length + 1;
-        }
-        token = strtok(NULL, " \n");
-        if (token == NULL) break;
-    }
-    transformed_source[transformed_length] = '\0';
-
-    fprintf(stderr, "%s", transformed_source);
-*/
     char output;
     int position = 0;
+
     while (token) {
-        if(strcasecmp(token, "push") == 0) {
+        if (strcasecmp(token, "push") == 0) {
             printf("%c", BC_PUSH);
             token = strtok(NULL, " \n");
             uint8_t value = strtol(token, NULL, 10);
             printf("%c", value);
+            position += 2;
         } else if (strcasecmp(token, "pop") == 0) {
             output = BC_POP;
             printf("%c", output);
+            position += 1;
         } else if (strcasecmp(token, "add") == 0) {
             output = BC_ADD;
             printf("%c", output);
+            position += 1;
         } else if (strcasecmp(token, "neg") == 0) {
             output = BC_NEG;
             printf("%c", output);
+            position += 1;
         } else if (strcasecmp(token, "jump") == 0) {
             printf("%c", BC_JUMP);
             token = strtok(NULL, " \n");
             uint8_t value = strtol(token, NULL, 10);
+            if (value == 0 && errno == EINVAL) {
+                void* lbl_val = ht_get(sym_table, token);
+                if (lbl_val == NULL) {
+                    fprintf(stderr, "nonexistent label\n");
+                } else {
+                    value = (uint8_t) lbl_val;
+                }
+            }
             printf("%c", value);
+            position += 2;
         } else if (strcasecmp(token, "cmp") == 0) {
             output = BC_CMP;
             printf("%c", output);
+            position += 1;
         } else if (strcasecmp(token, "rjmp") == 0) {
             printf("%c", BC_RJUMP);
             token = strtok(NULL, " \n");
             uint8_t value = strtol(token, NULL, 10);
             printf("%c", value);
+            position += 2;
         } else {
             char last = token[strlen(token)-1];
             fprintf(stderr, "%c", last);
             if (last == ':') { //label
-
+                token[strlen(token)-1] = '\0';
+                ht_set(sym_table, token, (void*) (int*) position);
             }
         }
-
 
         token = strtok(NULL, " \n");
     } 
