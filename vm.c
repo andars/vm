@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
         case BC_PUSH: 
             printf("BC_PUSH\n");
             fread(&a, 1, 1, input);
+            printf("%d\n", a);
             stack[++stack_top] = a;
             break;
         case BC_POP:
